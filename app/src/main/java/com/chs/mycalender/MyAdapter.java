@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.chs.mycalender.util.ScrollUtil;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -70,6 +72,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
         }
         //年月日都相等才是同一天圈红
         if (currentDay == cell.getDay() && currentMonth == cell.getMonth() && currentYear == cell.getYear()) {
+            ScrollUtil.currentPos = position;
             holder.tv_content.setDrawCircle(true);
             if(cell.isClicked()){
                 holder.tv_content.setTextColor(ContextCompat.getColor(mContext, R.color.white));
