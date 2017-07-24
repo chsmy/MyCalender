@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
     private Context mContext;
     private OnItemClickListener mOnItemClickListener;
     private Paint mPaint;
+    private int mType;//1 是月 2是周
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
     }
@@ -29,9 +31,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
         void onItemClicked(int position);
     }
 
-    MyAdapter(Context context, List<Cell> cells) {
+    MyAdapter(Context context, List<Cell> cells,int type) {
         mCells = cells;
         mContext = context;
+        mType = type;
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -61,7 +64,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
 
         int month = MyCalendar.mCalendar.get(Calendar.MONTH) + 1;
         //月份不一样的变灰
-        if (MyCalendar.styleType == 1) {
+        Log.i("month",cell.getMonth()+"");
+        if (mType == 1) {
             if (cell.getMonth() != month) {
                 holder.tv_content.setTextColor(ContextCompat.getColor(mContext, R.color.gray));
             } else {
@@ -72,7 +76,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
         }
         //年月日都相等才是同一天圈红
         if (currentDay == cell.getDay() && currentMonth == cell.getMonth() && currentYear == cell.getYear()) {
-            ScrollUtil.currentPos = position;
+            if(mType == 1){
+                ScrollUtil.currentPos = position;
+            }
             holder.tv_content.setDrawCircle(true);
             if(cell.isClicked()){
                 holder.tv_content.setTextColor(ContextCompat.getColor(mContext, R.color.white));

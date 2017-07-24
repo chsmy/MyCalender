@@ -40,16 +40,6 @@ public class ViewPagerBehavior extends CoordinatorLayout.Behavior<ViewPager> {
         MyCalendar.CalendarAdapter calendarAdapter = (MyCalendar.CalendarAdapter) child.getAdapter();
         int maxHeight = ScrollUtil.getCurrentHeight(mContext);
         Log.i("offSet", child.getTop() + "---" + maxHeight + "---*" + dependency.getTop());
-        if (Math.abs(child.getTop()) >= maxHeight && dependency.getTop() <= 90) {
-//            if (MyCalendar.styleType == 1) {
-//                calendarAdapter.changeStyle(2);
-//            }
-        }
-        if (child.getTop() >= 0 && dependency.getTop() > mTop) {
-//            if (MyCalendar.styleType == 2) {
-//                calendarAdapter.changeStyle(1);
-//            }
-        }
         int dy = mTop - dependency.getTop();
         Log.i("offset","dy:"+dy);
         //上滑

@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -225,14 +226,15 @@ public class MyCalendar extends LinearLayout {
         tv_current_date.setText(dateFormat.format(mCalendar.getTime()));
 
         Calendar monthCalendar = (Calendar) mCalendar.clone();
-        //前面几天 不属于这个月的天数
-        int previousDays = monthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
-        monthCalendar.add(Calendar.DAY_OF_MONTH, -previousDays);
         //月类型的一个日历最多6行7列
         int maxMonthCount = 6 * 7;
         //置为当月的第一天
         monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
+        //前面几天 不属于这个月的天数
+        int previousDays = monthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
+        monthCalendar.add(Calendar.DAY_OF_MONTH, -previousDays);
         MonthCells.clear();
+        Log.i("date",monthCalendar.get(Calendar.YEAR)+"年"+(monthCalendar.get(Calendar.MONTH) + 1)+"月"+ monthCalendar.get(Calendar.DAY_OF_MONTH)+"日");
         while (MonthCells.size() < maxMonthCount) {
             MonthCells.add(new Cell(monthCalendar.get(Calendar.DAY_OF_MONTH), monthCalendar.get(Calendar.MONTH) + 1, monthCalendar.get(Calendar.YEAR)));
             monthCalendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -240,11 +242,11 @@ public class MyCalendar extends LinearLayout {
         mMonthCalendars = mMonthCalendarAdapter.getCalendars();
 
         Calendar weekCalendar = (Calendar) mCalendar.clone();
-        //前面几天 不属于这个月的天数
-        int previousDays_ = monthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
-        weekCalendar.add(Calendar.DAY_OF_MONTH, -previousDays_);
         //星期类型的就7个
         int maxWeekCount = 7;
+        //前面几天 不属于这个月的天数
+        int previousDays_ = weekCalendar.get(Calendar.DAY_OF_WEEK) - 1;
+        weekCalendar.add(Calendar.DAY_OF_MONTH, -previousDays_);
         Weekcells.clear();
         while (Weekcells.size() < maxWeekCount) {
             Weekcells.add(new Cell(weekCalendar.get(Calendar.DAY_OF_MONTH), weekCalendar.get(Calendar.MONTH) + 1, weekCalendar.get(Calendar.YEAR)));
@@ -291,9 +293,9 @@ public class MyCalendar extends LinearLayout {
             RecyclerView recyclerView = calendars.get(position % calendars.size());
             MyAdapter myAdapter = null;
             if (mFrom == 1) {
-                myAdapter = new MyAdapter(mContext, MonthCells);
+                myAdapter = new MyAdapter(mContext, MonthCells,1);
             } else {
-                myAdapter = new MyAdapter(mContext, Weekcells);
+                myAdapter = new MyAdapter(mContext, Weekcells,2);
             }
             myAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
                 @Override
