@@ -80,6 +80,7 @@ public class MyCalendar extends LinearLayout {
         initView(context);
         initEvent();
         renderView();
+        refresh();
 //        setType(1);
     }
 
@@ -157,9 +158,9 @@ public class MyCalendar extends LinearLayout {
                 }
                 renderView();
                 mMonthCurrentPosition = position;
-//                if (mMonthCalendars.get(position % mMonthCalendars.size()) != null) {
-//                    mMonthCalendars.get(position % mMonthCalendars.size()).getAdapter().notifyDataSetChanged();
-//                }
+                if (mMonthCalendars.get(position % mMonthCalendars.size()) != null) {
+                    mMonthCalendars.get(position % mMonthCalendars.size()).getAdapter().notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -193,9 +194,9 @@ public class MyCalendar extends LinearLayout {
                 }
                 renderView();
                 mWeekCurrentPosition = position;
-//                if (mWeekCalendars.get(position % mWeekCalendars.size()) != null) {
-//                    mWeekCalendars.get(position % mWeekCalendars.size()).getAdapter().notifyDataSetChanged();
-//                }
+                if (mWeekCalendars.get(position % mWeekCalendars.size()) != null) {
+                    mWeekCalendars.get(position % mWeekCalendars.size()).getAdapter().notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -225,7 +226,22 @@ public class MyCalendar extends LinearLayout {
             }
         });
     }
-
+    private void refresh(){
+        if (mMonthCalendars.get(mMonthCurrentPosition % mMonthCalendars.size()) != null) {
+            RecyclerView recyclerView = mMonthCalendars.get(mMonthCurrentPosition % mMonthCalendars.size());
+            RecyclerView.Adapter adapter = recyclerView.getAdapter();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+        }
+        if (mWeekCalendars.get(mWeekCurrentPosition % mWeekCalendars.size()) != null) {
+            RecyclerView recyclerView = mWeekCalendars.get(mWeekCurrentPosition % mWeekCalendars.size());
+            RecyclerView.Adapter adapter = recyclerView.getAdapter();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
     //渲染recycleview
     private void renderView() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM");
@@ -246,13 +262,7 @@ public class MyCalendar extends LinearLayout {
             monthCalendar.add(Calendar.DAY_OF_MONTH, 1);
         }
         mMonthCalendars = mMonthCalendarAdapter.getCalendars();
-        if (mMonthCalendars.get(mMonthCurrentPosition % mMonthCalendars.size()) != null) {
-            RecyclerView recyclerView = mMonthCalendars.get(mMonthCurrentPosition % mMonthCalendars.size());
-            RecyclerView.Adapter adapter = recyclerView.getAdapter();
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
-            }
-        }
+
         /*-------------星期----------*/
         Calendar weekCalendar = (Calendar) mCalendar.clone();
         //星期类型的就7个
@@ -266,13 +276,6 @@ public class MyCalendar extends LinearLayout {
             weekCalendar.add(Calendar.DAY_OF_MONTH, 1);
         }
         mWeekCalendars = mWeekCalendarAdapter.getCalendars();
-        if (mWeekCalendars.get(mWeekCurrentPosition % mWeekCalendars.size()) != null) {
-            RecyclerView recyclerView = mWeekCalendars.get(mWeekCurrentPosition % mWeekCalendars.size());
-            RecyclerView.Adapter adapter = recyclerView.getAdapter();
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
-            }
-        }
     }
 
     public class CalendarAdapter extends PagerAdapter {
