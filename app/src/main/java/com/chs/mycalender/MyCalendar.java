@@ -2,6 +2,7 @@ package com.chs.mycalender;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.chs.mycalender.util.ScrollUtil;
+import com.chs.mycalender.behavior.RecycleViewBehavior;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class MyCalendar extends LinearLayout {
     private ViewPager mViewPagerMonth;
     private ViewPager mViewPagerWeek;
     private RecyclerView mRecyclerView;
+    private CoordinatorLayout mCoordinatorLayout;
     public static Calendar mCalendar = Calendar.getInstance();//全局的mCalendar 改变的时候所有地方都改变
     private Context mContext;
     private List<Cell> MonthCells = new ArrayList<>();
@@ -77,8 +79,8 @@ public class MyCalendar extends LinearLayout {
         initRecycleData();
         initView(context);
         initEvent();
-//        renderView();
-        setType(1);
+        renderView();
+//        setType(1);
     }
 
     private void initRecycleData() {
@@ -89,7 +91,6 @@ public class MyCalendar extends LinearLayout {
 
     public void setType(int type) {
         this.styleType = type;
-        int maxHeight = ScrollUtil.getCurrentHeight(mContext);
         if (type == 1) {
             tv_last.setText("上个月");
             tv_next.setText("下个月");
@@ -97,14 +98,18 @@ public class MyCalendar extends LinearLayout {
             tv_last.setText("上星期");
             tv_next.setText("下星期");
         }
-        renderView();
-        if (mMonthCalendars.get(mMonthCurrentPosition % mMonthCalendars.size()) != null) {
-            RecyclerView recyclerView = mMonthCalendars.get(mMonthCurrentPosition % mMonthCalendars.size());
-            RecyclerView.Adapter adapter = recyclerView.getAdapter();
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
+        RecycleViewBehavior behavior = (RecycleViewBehavior) ((CoordinatorLayout.LayoutParams)mRecyclerView.getLayoutParams()).getBehavior();
+        if (behavior != null){
+            if(mViewPagerWeek.getVisibility() == GONE){
+                mViewPagerWeek.setVisibility(VISIBLE);
+            }else {
+                mViewPagerWeek.setVisibility(GONE);
             }
+            behavior.onLayoutChild(mCoordinatorLayout,mRecyclerView,200);
         }
+
+//        renderView();
+
     }
 
     public int getType() {
@@ -124,19 +129,20 @@ public class MyCalendar extends LinearLayout {
         tv_last = (TextView) view.findViewById(R.id.tv_last);
         tv_current_date = (TextView) view.findViewById(R.id.tv_current_date);
         tv_next = (TextView) view.findViewById(R.id.tv_next);
-
+        mCoordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.content);
+        //月份
         mViewPagerMonth = (ViewPager) view.findViewById(R.id.viewpager_month);
         mMonthCalendarAdapter = new CalendarAdapter(1);
         mViewPagerMonth.setAdapter(mMonthCalendarAdapter);
         mViewPagerMonth.setCurrentItem(Integer.MAX_VALUE / 2);
         mMonthCurrentPosition = Integer.MAX_VALUE / 2;
-        mViewPagerMonth.setPageTransformer(false, new ViewPager.PageTransformer() {
-            @Override
-            public void transformPage(View page, float position) {
-                position = (float) Math.sqrt(1 - Math.abs(position));
-                page.setAlpha(position);
-            }
-        });
+//        mViewPagerMonth.setPageTransformer(false, new ViewPager.PageTransformer() {
+//            @Override
+//            public void transformPage(View page, float position) {
+//                position = (float) Math.sqrt(1 - Math.abs(position));
+//                page.setAlpha(position);
+//            }
+//        });
         mViewPagerMonth.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -151,28 +157,28 @@ public class MyCalendar extends LinearLayout {
                 }
                 renderView();
                 mMonthCurrentPosition = position;
-                if (mMonthCalendars.get(position % mMonthCalendars.size()) != null) {
-                    mMonthCalendars.get(position % mMonthCalendars.size()).getAdapter().notifyDataSetChanged();
-                }
+//                if (mMonthCalendars.get(position % mMonthCalendars.size()) != null) {
+//                    mMonthCalendars.get(position % mMonthCalendars.size()).getAdapter().notifyDataSetChanged();
+//                }
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
             }
         });
-
+        //星期
         mViewPagerWeek = (ViewPager) view.findViewById(R.id.viewpager_week);
         mWeekCalendarAdapter = new CalendarAdapter(2);
         mViewPagerWeek.setAdapter(mWeekCalendarAdapter);
         mViewPagerWeek.setCurrentItem(Integer.MAX_VALUE / 2);
         mWeekCurrentPosition = Integer.MAX_VALUE / 2;
-        mViewPagerWeek.setPageTransformer(false, new ViewPager.PageTransformer() {
-            @Override
-            public void transformPage(View page, float position) {
-                position = (float) Math.sqrt(1 - Math.abs(position));
-                page.setAlpha(position);
-            }
-        });
+//        mViewPagerWeek.setPageTransformer(false, new ViewPager.PageTransformer() {
+//            @Override
+//            public void transformPage(View page, float position) {
+//                position = (float) Math.sqrt(1 - Math.abs(position));
+//                page.setAlpha(position);
+//            }
+//        });
         mViewPagerWeek.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -187,9 +193,9 @@ public class MyCalendar extends LinearLayout {
                 }
                 renderView();
                 mWeekCurrentPosition = position;
-                if (mWeekCalendars.get(position % mWeekCalendars.size()) != null) {
-                    mWeekCalendars.get(position % mWeekCalendars.size()).getAdapter().notifyDataSetChanged();
-                }
+//                if (mWeekCalendars.get(position % mWeekCalendars.size()) != null) {
+//                    mWeekCalendars.get(position % mWeekCalendars.size()).getAdapter().notifyDataSetChanged();
+//                }
             }
 
             @Override
@@ -224,7 +230,7 @@ public class MyCalendar extends LinearLayout {
     private void renderView() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM");
         tv_current_date.setText(dateFormat.format(mCalendar.getTime()));
-
+        /*-------------月份----------*/
         Calendar monthCalendar = (Calendar) mCalendar.clone();
         //月类型的一个日历最多6行7列
         int maxMonthCount = 6 * 7;
@@ -240,7 +246,14 @@ public class MyCalendar extends LinearLayout {
             monthCalendar.add(Calendar.DAY_OF_MONTH, 1);
         }
         mMonthCalendars = mMonthCalendarAdapter.getCalendars();
-
+        if (mMonthCalendars.get(mMonthCurrentPosition % mMonthCalendars.size()) != null) {
+            RecyclerView recyclerView = mMonthCalendars.get(mMonthCurrentPosition % mMonthCalendars.size());
+            RecyclerView.Adapter adapter = recyclerView.getAdapter();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+        }
+        /*-------------星期----------*/
         Calendar weekCalendar = (Calendar) mCalendar.clone();
         //星期类型的就7个
         int maxWeekCount = 7;
@@ -253,6 +266,13 @@ public class MyCalendar extends LinearLayout {
             weekCalendar.add(Calendar.DAY_OF_MONTH, 1);
         }
         mWeekCalendars = mWeekCalendarAdapter.getCalendars();
+        if (mWeekCalendars.get(mWeekCurrentPosition % mWeekCalendars.size()) != null) {
+            RecyclerView recyclerView = mWeekCalendars.get(mWeekCurrentPosition % mWeekCalendars.size());
+            RecyclerView.Adapter adapter = recyclerView.getAdapter();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
 
     public class CalendarAdapter extends PagerAdapter {

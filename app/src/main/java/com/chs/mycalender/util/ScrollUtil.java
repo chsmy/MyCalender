@@ -14,7 +14,7 @@ public class ScrollUtil {
     public static int currentPos ;
     public static int getCurrentHeight(Context context){
         int curPos = currentPos+1;
-        int every = DensityUtil.dip2px(context,30);
+        int every = DensityUtil.dip2px(context,40);
         int row;
         if(curPos%7!=0){
             row = (int) Math.floor(curPos / 7);

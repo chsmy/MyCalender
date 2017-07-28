@@ -17,6 +17,7 @@ import com.chs.mycalender.util.ScrollUtil;
  */
 
 public class RecycleViewBehavior extends CoordinatorLayout.Behavior<RecyclerView> {
+    private int cellHeight;//每一行的高度
     private int minHeight;
     private int maxHeight;
     private Context mContext;
@@ -24,8 +25,9 @@ public class RecycleViewBehavior extends CoordinatorLayout.Behavior<RecyclerView
     public RecycleViewBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
-        minHeight = DensityUtil.dip2px(context,30);
-        maxHeight = DensityUtil.dip2px(context,180);
+        cellHeight = DensityUtil.dip2px(context,40);
+        minHeight = cellHeight;
+        maxHeight = cellHeight*6;
     }
 
     //view需要根据监听CoordinatorLayout中的子view的滚动行为来改变自己的状态，现在我们就需要重写下面的方法了：
@@ -45,7 +47,7 @@ public class RecycleViewBehavior extends CoordinatorLayout.Behavior<RecyclerView
         if(dy < 0){
             return;
         }
-
+         //RecyclerView离顶端最少一个行的高度
         if(dy>0&&child.getTop()>minHeight){
             int currentMaxHeight = ScrollUtil.getCurrentHeight(mContext);
             Log.i("ChildAt","ChildAt"+coordinatorLayout.getChildAt(0).getTop() +"currentMaxHeight:"+currentMaxHeight);
@@ -55,9 +57,9 @@ public class RecycleViewBehavior extends CoordinatorLayout.Behavior<RecyclerView
 
             scroll(child,dy,minHeight,maxHeight);
             consumed[1] = dy;
-        }else {
+        }else {//week的viewpager显示
             coordinatorLayout.getChildAt(1).setVisibility(View.VISIBLE);
-            maxHeight= DensityUtil.dip2px(mContext,180);
+            maxHeight= cellHeight*6;
         }
 
     }
@@ -70,17 +72,18 @@ public class RecycleViewBehavior extends CoordinatorLayout.Behavior<RecyclerView
             return;
         }
         Log.i("dy","dyUnconsumed:"+dyUnconsumed +"maxHeight:"+maxHeight);
-        if(maxHeight== DensityUtil.dip2px(mContext,30)){
-            maxHeight = DensityUtil.dip2px(mContext,180);
+        if(maxHeight== cellHeight){
+            maxHeight = cellHeight*6;
         }
+        //RecyclerView最大高度不能高于maxHeight
         if(dyUnconsumed<0&&child.getTop()<maxHeight){
             if( coordinatorLayout.getChildAt(1).getVisibility() == View.VISIBLE){
-//                coordinatorLayout.getChildAt(0).setVisibility(View.VISIBLE);
                 coordinatorLayout.getChildAt(1).setVisibility(View.GONE);
                 isDown = true;
             }
             int currentMaxHeight = ScrollUtil.getCurrentHeight(mContext);
             Log.i("currentMaxHeight","currentMaxHeight:" +currentMaxHeight);
+            //移动月的viewpager
             if(coordinatorLayout.getChildAt(0).getTop()<0){
                 scroll(coordinatorLayout.getChildAt(0),dyUnconsumed,-currentMaxHeight,0);
             }
@@ -92,6 +95,7 @@ public class RecycleViewBehavior extends CoordinatorLayout.Behavior<RecyclerView
     public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View target) {
         super.onStopNestedScroll(coordinatorLayout, child, target);
     }
+    //滑动
     private void scroll(View child,int dy, int minOffset, int maxOffset){
         final int initOffset = child.getTop();
         int delta = offsetMaxAndMin(initOffset - dy, minOffset, maxOffset) - initOffset;
@@ -116,13 +120,13 @@ public class RecycleViewBehavior extends CoordinatorLayout.Behavior<RecyclerView
         Log.i("maxHeight_","maxHeight:" +isDown);
         if(parent.getChildAt(1).getVisibility() == View.GONE){
             if(isDown){
-                maxHeight= DensityUtil.dip2px(mContext,30);
+                maxHeight= cellHeight;
             }else {
-                maxHeight= DensityUtil.dip2px(mContext,180);
+                maxHeight= cellHeight*6;
             }
             isDown = false;
         }else {
-            maxHeight= DensityUtil.dip2px(mContext,30);
+            maxHeight= cellHeight;
         }
 
         ViewCompat.offsetTopAndBottom(child,maxHeight);
